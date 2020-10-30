@@ -324,6 +324,7 @@ class wxWidgetsConan(ConanFile):
             self.cpp_info.defines.append('__WXGTK__')
             self.cpp_info.defines.append('__WXGTK3__')
             self.add_libraries_from_pc('gtk+-3.0')
+            self.add_libraries_from_pc('webkit2gtk-4.0')
             self.add_libraries_from_pc('x11')
             self.cpp_info.libs.extend(['dl', 'pthread', 'png'])
             #self.cpp_info.libs.extend(['dl', 'pthread', 'SM'])
