@@ -67,7 +67,7 @@ class wxWidgetsConan(ConanFile):
                "richtext": True,
                "sockets": True,
                "stc": True,
-               "webview": False,
+               "webview": True,
                "xml": True,
                "xrc": True,
                "cairo": True,
@@ -176,7 +176,7 @@ class wxWidgetsConan(ConanFile):
         cmake.definitions['wxUSE_PROPGRID'] = self.options.propgrid
         cmake.definitions['wxUSE_DEBUGREPORT'] = self.options.debugreport
         cmake.definitions['wxUSE_RIBBON'] = self.options.ribbon
-        cmake.definitions['wxUSE_REGEX'] = 'builtin'
+        cmake.definitions['wxUSE_REGEX'] = 'OFF' #'builtin'
         cmake.definitions['wxUSE_RICHTEXT'] = self.options.richtext
         cmake.definitions['wxUSE_SOCKETS'] = self.options.sockets
         cmake.definitions['wxUSE_STC'] = self.options.stc
@@ -275,10 +275,13 @@ class wxWidgetsConan(ConanFile):
         libs = ['{prefix}base{version}{unicode}{debug}{suffix}',
                 library_pattern('core'),
                 library_pattern('adv')]
-        #pim:addded
-        libs.append(external_library_pattern('regex'))
-        libs.append(external_library_pattern_no_unicode('scintilla'))
         
+        #libs.append(external_library_pattern_no_unicode('scintilla'))
+        if self.options.stc:
+            if not self.options.shared:
+                scintilla_suffix = '{debug}' if self.settings.os == "Windows" else '{suffix}'
+                libs.append('wxscintilla' + scintilla_suffix)
+            libs.append(library_pattern('stc'))
         if self.options.sockets:
             libs.append(base_library_pattern('net'))
         if self.options.xml:
@@ -299,15 +302,13 @@ class wxWidgetsConan(ConanFile):
             libs.append(library_pattern('ribbon'))
         if self.options.richtext:
             libs.append(library_pattern('richtext'))
-        if self.options.stc:
-            if not self.options.shared:
-                scintilla_suffix = '{debug}' if self.settings.os == "Windows" else '{suffix}'
-                libs.append('wxscintilla' + scintilla_suffix)
-            libs.append(library_pattern('stc'))
         if self.options.webview:
             libs.append(library_pattern('webview'))
         if self.options.xrc:
             libs.append(library_pattern('xrc'))
+        #pim:addded
+#        libs.append(external_library_pattern('regex'))
+        
         for lib in reversed(libs):
             self.cpp_info.libs.append(lib.format(prefix=prefix,
                                                  toolkit=toolkit,
